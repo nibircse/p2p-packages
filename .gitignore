@@ -1,0 +1,14 @@
+*.swp
+*.swo
+
+linux/debian/control
+linux/debian/postinst
+linux/debian/changelog
+
+darwin/flat/Distribution
+darwin/flat/base.pkg/PackageInfo
+darwin/flat/base.pkg/Payload
+darwin/flat/base.pkg/Scripts
+darwin/root/Applications/SubutaiP2P.app/Contents/MacOS/SubutaiP2P
+darwin/root/bin/p2p
+

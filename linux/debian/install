@@ -1,0 +1,2 @@
+debian/p2p.service /etc/systemd/system/
+debian/p2p /opt/subutai/bin/

@@ -1,0 +1,172 @@
+#!/bin/bash
+
+debian=0
+darwin=0
+branch=""
+binary_name=p2p
+maintainer="Jenkins Admin"
+maintainer_email="jenkins@subut.ai"
+debian_release="trusty"
+postfix=""
+
+showhelp()
+{
+cat << ENDHELP
+
+usage: configure [options]
+Configure p2p packaging on linux/darwin
+
+Options:
+    --debian
+        Build debian package
+
+    --darwin
+        Build darwin package
+
+    --help
+        Display this help screen
+ENDHELP
+}
+
+getsource()
+{
+    rm -rf /tmp/p2p-source
+    git clone https://github.com/subutai-io/p2p.git /tmp/p2p-source
+    dir=`pwd`
+    cd /tmp/p2p-source
+    if [ "$branch" != "HEAD" ]; then
+        git checkout -B $branch
+        git pull origin $branch
+    else
+        tag=`git describe --abbrev=0`
+        git checkout tags/$tag
+    fi
+    cd $dir
+}
+
+getbinary()
+{
+    if [ "$branch" == "master" ]; then
+        local cdnPrefix="mastercdn"
+    elif [ "$branch" == "dev" ]; then
+        local cdnPrefix="devcdn"
+    else
+        local cdnPrefix="cdn"
+    fi
+    curl -o /tmp/$binary_name -fsSL https://$cdnPrefix.subut.ai:8338/kurjun/rest/raw/get?name=$binary_name
+    chmod +x /tmp/$binary_name
+}
+
+generate_changelog()
+{
+    if [ "$branch" == "master" ]; then
+        postfix="-master"
+    elif [ "$branch" == "dev" ]; then
+        postfix="-dev"
+    fi
+    rm -f /tmp/deb-changelog.tmp
+    started=0
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        st=${line:0:2}
+        if [ "$st" == "##" ]; then
+            if [ $started -eq 1 ]; then
+                date_formatted=`date -d"$release_date" "+%a, %d %b %Y %H:%M:%S %z"`
+                echo "" >> /tmp/deb-changelog.tmp
+                echo " -- $maintainer <$maintainer_email>  $date_formatted" >> /tmp/deb-changelog.tmp
+                echo "" >> /tmp/deb-changelog.tmp
+                started=0
+            fi
+            started=1
+            release_date=`echo $line | cut -d "]" -f2 | sed -e 's/^[[:space:]]*//'`
+            version_num=`echo $line | cut -d "[" -f2 | cut -d "]" -f1`
+            echo "subutai-p2p$postfix ($version_num$postfix-0ubuntu1~$debian_release) $debian_release; urgency=medium" >> /tmp/deb-changelog.tmp
+            echo "" >> /tmp/deb-changelog.tmp
+        elif [ "$st" == "* " ]; then
+            echo "  $line" >> /tmp/deb-changelog.tmp
+        fi
+    done < /tmp/p2p-source/CHANGELOG
+    if [ $started -eq 1 ]; then
+        date_formatted=`date -d"$release_date" "+%a, %d %b %Y %H:%M:%S %z"`
+        echo "" >> /tmp/deb-changelog.tmp
+        echo " -- $maintainer <$maintainer_email>  $date_formatted" >> /tmp/deb-changelog.tmp
+        echo "" >> /tmp/deb-changelog.tmp
+        started=0
+    fi
+    mv /tmp/deb-changelog.tmp linux/debian/changelog
+}
+
+generate_control() 
+{
+    if [ "$branch" == "master" ]; then
+        postfix="-master"
+    elif [ "$branch" == "dev" ]; then
+        postfix="-dev"
+    fi
+    local controlFile=linux/debian/control
+    echo "Source: subutai-p2p$postfix" > $controlFile
+    echo "Section: net" >> $controlFile
+    echo "Priority: optional" >> $controlFile
+    echo "Maintainer: $maintainer <$maintainer_email>" >> $controlFile
+    echo "Build-Depends: git (>=2), golang (>=1.9), debhelper (>=9)" >> $controlFile
+    echo "Standards-Version: 3.9.6" >> $controlFile
+    echo "Homepage: https://github.com/subutai-io/p2p" >> $controlFile
+    echo "" >> $controlFile
+    echo "Package: subutai-p2p$postfix" >> $controlFile
+    echo "Architecture: any" >> $controlFile
+    echo "Depends: \${shlibs:Depends}, \${misc:Depends}" >> $controlFile
+    echo "Description: P2P Networking for Subutai" >> $controlFile
+}
+
+generate_postinst() 
+{
+    local postinstFile=linux/debian/postinst
+    echo "#/bin/sh" > $postinstFile
+    echo "" >> $postinstFile
+    echo "if [ -e /usr/bin/p2p ]; then" >> $postinstFile
+	echo "rm -f /usr/bin/p2p" >> $postinstFile
+    echo "fi" >> $postinstFile
+    echo "ln -s /opt/subutai/bin/p2p /usr/bin/p2p" >> $postinstFile
+    echo "systemctl enable p2p.service" >> $postinstFile
+    echo "systemctl restart p2p.service" >> $postinstFile
+}
+
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --debian)
+            debian=1 ;;
+        --darwin)
+            debian=1 ;;
+        --branch=*)
+            branch="`echo ${1} | awk '{print substr($0,10)}'`" ;;
+        --help)
+            showhelp
+            exit 4
+            ;;
+        *) 
+            echo "Bad argument: $1"
+            showhelp
+            exit 3
+            ;;
+    esac
+
+    shift
+done
+
+if [ $debian -eq 1 ]; then
+    echo "Configuring for debian"
+    getsource
+    getbinary
+    generate_changelog
+    generate_control
+    generate_postinst
+    exit 0
+fi
+
+if [ $darwin -eq 1 ]; then
+    echo "Configuring for darwin"
+    binary_name=p2p_osx
+    exit 0
+fi
+echo "Target was not specified"
+showhelp
+exit 3
