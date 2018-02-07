@@ -1,15 +1,10 @@
 #!/bin/bash
 
-os=$1
-branch=$2
-file=$3
+branch=$1
+file=$2
+postfix="-travis-test"
 
 # Verify all arguments were specified
-
-if [ -z "$os" ]; then
-    echo "OS not specified"
-    exit 30
-fi
 
 if [ -z "$branch" ]; then
     echo "Branch is not specified"
@@ -30,14 +25,10 @@ fi
 
 # Verify OS and set directory accordingly
 
-if [ "$os" == "windows" ]; then
-    location="/c/tmp/p2p-packages"
-else
-    location="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    if [ "$location" != "/tmp/p2p-packages" ]; then
-        echo "Wrong script location: $location"
-        exit 1
-    fi
+location="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ "$location" != "/tmp/p2p-packages" ]; then
+    echo "Wrong script location: $location"
+    exit 1
 fi
 
 # ID of the file from Gorjun JSON response
@@ -54,28 +45,10 @@ exitonfail()
     fi
 }
 
-postfix=""
-basename="subutai-p2p"
+basename=`basename $file`
 
 gpg_cmd="gpg"
 outdir="/tmp"
-if [ "$os" == "debian" ]; then
-    postfix=".deb"
-    gpg_cmd=/usr/bin/gpg
-    outdir="/tmp"
-elif [ "$os" == "darwin" ]; then
-    postfix=".pkg"
-    gpg_cmd=/usr/local/bin/gpg
-    outdir="/tmp"
-elif [ "$os" == "windows" ]; then
-    postfix=".msi"
-    gpg_cmd=gpg
-    outdir="/c/tmp"
-else
-    echo "Unknown operating system"
-    exit 1
-fi
-
 stage=
 if [ "$branch" == "dev" ]; then
     newfile=$outdir/$basename-dev$postfix
@@ -86,13 +59,13 @@ elif [ "$branch" == "master" ]; then
 else 
     newfile=$outdir/$basename$postfix
 fi
+
 echo "Moving $file to $newfile"
 mv $file $newfile
 exitonfail
 
+# TODO: Replace removeFile with basename
 removeFile=`basename $newfile`
-#$location/remove.sh $os $removeFile $gpg_cmd $outdir
-exitonfail
 
 cdnUrl=https://eu0.${stage}cdn.subut.ai:8338/kurjun/rest
 USER=travis

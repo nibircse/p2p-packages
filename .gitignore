@@ -12,3 +12,8 @@ darwin/flat/base.pkg/Scripts
 darwin/root/Applications/SubutaiP2P.app/Contents/MacOS/SubutaiP2P
 darwin/root/bin/p2p
 
+private.key
+public.key
+*.key
+*.gpg
+*.pgp
