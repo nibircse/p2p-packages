@@ -20,7 +20,7 @@ fi
 
 if [ "$branch" != "master" ] && [ "$branch" != "dev" ] && [ "$branch" != "HEAD" ]; then
     echo "Branch $branch is unsupported"
-    exit 22
+    echo 0
 fi
 
 # Verify OS and set directory accordingly
