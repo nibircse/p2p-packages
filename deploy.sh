@@ -1,7 +1,7 @@
 #!/bin/bash
 
-branch=$1
-file=$2
+file=$1
+branch=$2
 postfix="-travis-test"
 
 # Verify all arguments were specified
