@@ -64,4 +64,4 @@ sed -i -e "s/{SIZE_PLACEHOLDER}/$mbsize/g" $location/flat/Distribution
 ( cd $location/root && find . | cpio -o --format odc --owner 0:80 | gzip -c ) > $location/flat/base.pkg/Payload
 ( cd $location/scripts && find . | cpio -o --format odc --owner 0:80 | gzip -c ) > $location/flat/base.pkg/Scripts
 mkbom -u 0 -g 80 $location/root $location/flat/base.pkg/Bom
-( cd $location/flat && xar --compression none -cf "/tmp/p2p-packaging/darwin/p2p.pkg" * )
+( cd $location/flat && xar --compression none -cf "/tmp/p2p-packages/darwin/p2p.pkg" * )
