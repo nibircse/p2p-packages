@@ -75,8 +75,10 @@ EMAIL=travis@subut.ai
 
 json=`curl -k -s -X GET $cdnUrl/raw/info?name=$removeFile`
 echo "Received: $json"
-extract_id
-echo "Previous file ID is $id"
+if [ "$json" != "Not Found" ]; then
+    extract_id
+    echo "Previous file ID is $id"
+fi
 
 PUBLICKEY=$($gpg_cmd --armor --export $EMAIL)
 curl -k "$cdnUrl/auth/token?user=$USER" -o $outdir/filetosign
@@ -90,8 +92,8 @@ TOKEN=$(curl -k -s -Fmessage="`cat $outdir/filetosign.asc`" -Fuser=$USER "$cdnUr
 echo "Uploading new file"
 curl -k -v -H "token: $TOKEN" -Ffile=@$newfile -Ftoken=$TOKEN "$cdnUrl/raw/upload"
 
-echo "Removing previous"
-if [ ! -z "$id" ]; then
+if [ ! -z "$id" ] && [ $? -eq 0 ]; then
+    echo "Removing previous"
     curl -k -s -X DELETE "$cdnUrl/raw/delete?id=$id&token=$TOKEN"
     exitonfail
 fi
