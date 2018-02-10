@@ -2,7 +2,7 @@
 
 file=$1
 branch=$2
-postfix="-travis-test"
+postfix=$3
 
 # Verify all arguments were specified
 
