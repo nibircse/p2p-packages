@@ -4,8 +4,8 @@ debian=0
 darwin=0
 branch=""
 binary_name=p2p
-maintainer="Jenkins Admin"
-maintainer_email="jenkins@subut.ai"
+maintainer="Travis CI"
+maintainer_email="travis@subut.ai"
 debian_release="trusty"
 postfix=""
 
