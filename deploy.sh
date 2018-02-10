@@ -4,8 +4,6 @@ file=$1
 branch=$2
 postfix=$3
 
-set -x
-
 # Verify all arguments were specified
 
 if [ -z "$branch" ]; then
@@ -91,8 +89,9 @@ $gpg_cmd --armor -u $EMAIL --clearsign $outdir/filetosign
 echo "Getting token"
 TOKEN=$(curl -k -s -Fmessage="`cat $outdir/filetosign.asc`" -Fuser=$USER "$cdnUrl/auth/token")
 
+ls -l /tmp
 echo "Uploading new file"
-curl -k -v -H "token: $TOKEN" -Ffile=@$newfile -Ftoken=$TOKEN "$cdnUrl/raw/upload"
+curl -k -v -H "token: $TOKEN" -Ffile=@$newfile "$cdnUrl/raw/upload"
 
 if [ ! -z "$id" ] && [ $? -eq 0 ]; then
     echo "Removing previous"
