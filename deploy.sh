@@ -4,6 +4,8 @@ file=$1
 branch=$2
 postfix=$3
 
+set -x
+
 # Verify all arguments were specified
 
 if [ -z "$branch" ]; then
