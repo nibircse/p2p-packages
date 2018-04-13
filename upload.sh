@@ -51,3 +51,25 @@ extract_id()
     fi
 }
 
+stage=
+
+if [ "$target" == "master" ]; then
+    stage="master"
+elif [ "$target" == "dev" ]; then
+    stage="dev"
+elif [ "$target" == "sysnet" ]; then
+    stage="sysnet"
+fi
+
+filename=`basename $file`
+
+json=`curl -k -s -X GET $cdnUrl/raw/info?name=$filename`
+echo "Received: $json"
+if [ "$json" != "Not Found" ]; then
+    extract_id
+    echo "Previous file ID is $id"
+else
+    echo "File not found on CDN. Exiting"
+    exit 15
+fi
+
