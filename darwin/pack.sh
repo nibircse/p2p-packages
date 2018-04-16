@@ -52,13 +52,13 @@ echo "MBSize: $mbsize"
 
 cp $location/PackageInfo.tmpl $location/flat/base.pkg/PackageInfo
 sed -i -e "s/{VERSION_PLACEHOLDER}/$version_number/g" $location/flat/base.pkg/PackageInfo
-sed -i -e "s/{SIZE_PLACEHOLDER}/$mbsize/g" $location/flat/base.pkg/PackageInfo
+sed -i -e "s/{SIZE_PLACEHOLDER}/$rootsize/g" $location/flat/base.pkg/PackageInfo
 sed -i -e "s/{FILES_PLACEHOLDER}/$rootfiles/g" $location/flat/base.pkg/PackageInfo
 
 # modify Distribution
 cp $location/Distribution.tmpl $location/flat/Distribution
 sed -i -e "s/{VERSION_PLACEHOLDER}/$version_number/g" $location/flat/Distribution
-sed -i -e "s/{SIZE_PLACEHOLDER}/$mbsize/g" $location/flat/Distribution
+sed -i -e "s/{SIZE_PLACEHOLDER}/$rootsizesize/g" $location/flat/Distribution
 
 # Pack and bom
 ( cd $location/root && find . | cpio -o --format odc --owner 0:80 | gzip -c ) > $location/flat/base.pkg/Payload
