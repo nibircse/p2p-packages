@@ -4,7 +4,10 @@ file=$1
 branch=$2
 postfix=$3
 
+osname=`uname -s`
+
 # Verify all arguments were specified
+echo "Deploying for $osname"
 
 if [ -z "$branch" ]; then
     echo "Branch is not specified"
