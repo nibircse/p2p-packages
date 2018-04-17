@@ -67,7 +67,7 @@ exitonfail
 # TODO: Replace removeFile with basename
 removeFile=`basename $newfile`
 
-cdnUrl=https://eu0.${stage}cdn.subut.ai:8338/kurjun/rest
+cdnUrl=https://eu0.${stage}cdn.subutai.io:8338/kurjun/rest
 USER=travis
 EMAIL=travis@subut.ai
 

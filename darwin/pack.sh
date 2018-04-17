@@ -27,7 +27,7 @@ rm -f $location/*.pkg
 # Copy files
 mkdir -p $location/flat/Resources/en.lproj
 mkdir -p $location/flat/base.pkg
-mkdir -p $location/root/bin
+#mkdir -p $location/root/bin
 mkdir -p $location/root/Library/LaunchDaemons
 mkdir -p $location/root/etc/newsyslog.d
 mkdir -p $location/root/Applications/SubutaiP2P.app/Contents/MacOS
@@ -35,7 +35,7 @@ mkdir -p $location/root/Applications/SubutaiP2P.app/Contents/PlugIns
 mkdir -p $location/root/Applications/SubutaiP2P.app/Contents/Resources
 
 cp $p2p_binary $location/root/Applications/SubutaiP2P.app/Contents/MacOS/SubutaiP2P
-cp $p2p_binary $location/root/bin/p2p
+#cp $p2p_binary $location/root/bin/p2p
 cp $location/io.subutai.p2p.daemon.plist.tmpl $location/root/Library/LaunchDaemons/io.subutai.p2p.daemon.plist
 cp $location/p2p.conf.tmpl $location/root/etc/newsyslog.d/p2p.conf
 
@@ -64,4 +64,5 @@ sed -i -e "s/{SIZE_PLACEHOLDER}/$rootsize/g" $location/flat/Distribution
 ( cd $location/root && find . | cpio -o --format odc --owner 0:80 | gzip -c ) > $location/flat/base.pkg/Payload
 ( cd $location/scripts && find . | cpio -o --format odc --owner 0:80 | gzip -c ) > $location/flat/base.pkg/Scripts
 mkbom -u 0 -g 80 $location/root $location/flat/base.pkg/Bom
-( cd $location/flat && xar --compression none -cf "/tmp/p2p-packages/darwin/p2p.pkg" * )
+mkdir -p /tmp/p2p-packaging/darwin
+( cd $location/flat && xar --compression none -cf "/tmp/p2p-packaging/darwin/p2p.pkg" * )
