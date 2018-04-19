@@ -37,8 +37,12 @@ fi
 # ID of the file from Gorjun JSON response
 extract_id()
 {
-    id_src=$(echo $json | grep -Po '"id":".*?[^\\]"')
-    id=${id_src:6:36}
+    if [ "$osname" == "Linux" ]; then
+        id_src=$(echo $json | grep -Po '"id":".*?[^\\]"')
+        id=${id_src:6:36}
+    else
+        id=`echo $json | sed -e 's/^.*"id":"\([^"]*\)".*$/\1/'`
+    fi
 }
 
 exitonfail()
