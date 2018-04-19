@@ -23,6 +23,9 @@ Options:
     --darwin
         Build darwin package
 
+    --branch=<branch>
+        Specify a target branch
+
     --help
         Display this help screen
 ENDHELP
