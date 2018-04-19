@@ -28,8 +28,16 @@ fi
 
 # Verify OS and set directory accordingly
 
+if [ "$osname" == "Darwin" ]; then
+    expected_location="/tmp/p2p-packages"
+elif [ "$osname" == "Linux" ]; then
+    expected_location="/tmp/p2p-packages"
+else
+    expected_location="/c/tmp/p2p-packages"
+fi
+
 location="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ "$location" != "/tmp/p2p-packages" ]; then
+if [ "$location" != "$expected_location" ]; then
     echo "Wrong script location: $location"
     exit 1
 fi
