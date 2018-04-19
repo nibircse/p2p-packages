@@ -54,10 +54,10 @@ gpg_cmd="gpg"
 outdir="/tmp"
 stage=
 if [ "$branch" == "dev" ]; then
-    newfile=$outdir/$basename-dev$postfix
+    newfile=$outdir/$basename$postfix
     stage="dev"
 elif [ "$branch" == "master" ]; then
-    newfile=$outdir/$basename-master$postfix
+    newfile=$outdir/$basename$postfix
     stage="master"
 else 
     newfile=$outdir/$basename$postfix
